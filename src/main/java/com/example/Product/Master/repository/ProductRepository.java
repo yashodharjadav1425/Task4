@@ -1,0 +1,9 @@
+package com.example.Product.Master.repository;
+
+import com.example.Product.Master.entity.ProductEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
+}
