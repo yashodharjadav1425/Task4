@@ -1,6 +1,7 @@
 package com.example.Product.Master.entity;
 
 import com.example.Product.Master.services.CategoryService;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -56,13 +57,17 @@ public class ProductEntity {
 
     private boolean isActive;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "categoryId")
     private CategoryEntity category;
 
-    @ManyToOne
-    @JoinColumn(name = "subCategoryId")
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subcategory_id", nullable = false)
     private SubCategoryEntity subCategory;
+
+
 
     public long getProductId() {
         return productId;
@@ -86,22 +91,6 @@ public class ProductEntity {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public CategoryEntity getCategory() {
-        return category;
-    }
-
-    public void setCategory(CategoryEntity category) {
-        this.category = category;
-    }
-
-    public SubCategoryEntity getSubCategory() {
-        return subCategory;
-    }
-
-    public void setSubCategory(SubCategoryEntity subCategory) {
-        this.subCategory = subCategory;
     }
 
     public BigDecimal getPrice() {
@@ -182,5 +171,21 @@ public class ProductEntity {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public CategoryEntity getCategory() {
+        return category;
+    }
+
+    public void setCategory(CategoryEntity category) {
+        this.category = category;
+    }
+
+    public SubCategoryEntity getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(SubCategoryEntity subCategory) {
+        this.subCategory = subCategory;
     }
 }

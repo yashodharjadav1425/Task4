@@ -2,6 +2,7 @@ package com.example.Product.Master.services;
 
 import com.example.Product.Master.entity.CategoryEntity;
 import com.example.Product.Master.entity.ProductEntity;
+import com.example.Product.Master.entity.SubCategoryEntity;
 import com.example.Product.Master.exception.ResourceNotFoundException;
 import com.example.Product.Master.repository.CategoryRepository;
 import com.example.Product.Master.repository.ProductRepository;
@@ -19,6 +20,13 @@ public class CategoryService {
     }
 
     public CategoryEntity createCategory(CategoryEntity category){
+
+        if(category.getSubCategoryList() != null){
+            for (SubCategoryEntity subCategory : category.getSubCategoryList()){
+                subCategory.setCategory(category);
+            }
+        }
+
         return categoryRepository.save(category);
     }
 
@@ -27,7 +35,8 @@ public class CategoryService {
     }
 
     public CategoryEntity updateCategory(Long categoryId, CategoryEntity updatedCategory){
-        CategoryEntity existingCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + categoryId));
+        CategoryEntity existingCategory = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + categoryId));
 
         existingCategory.setCategoryName(updatedCategory.getCategoryName());
         existingCategory.setDescription(updatedCategory.getDescription());
@@ -41,6 +50,7 @@ public class CategoryService {
 
         CategoryEntity existingCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + categoryId));
+
         categoryRepository.delete(existingCategory);
     }
 

@@ -20,9 +20,9 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @PostMapping
-    public ResponseEntity<ProductEntity> createProduct(@Valid @RequestBody ProductEntity product){
-        return ResponseEntity.status(201).body(productService.createProduct(product));
+    @PostMapping("/subcategory/{subcategoryId}")
+    public ResponseEntity<ProductEntity> createProduct(@RequestParam Long subcategoryId, @Valid @RequestBody ProductEntity product){
+        return ResponseEntity.status(201).body(productService.createProduct(subcategoryId, product));
     }
 
     @GetMapping

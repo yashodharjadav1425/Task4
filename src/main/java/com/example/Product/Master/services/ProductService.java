@@ -1,7 +1,9 @@
 package com.example.Product.Master.services;
 import com.example.Product.Master.entity.ProductEntity;
+import com.example.Product.Master.entity.SubCategoryEntity;
 import com.example.Product.Master.exception.ResourceNotFoundException;
 import com.example.Product.Master.repository.ProductRepository;
+import com.example.Product.Master.repository.SubCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,12 +15,18 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final SubCategoryRepository subCategoryRepository;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, SubCategoryRepository subCategoryRepository) {
         this.productRepository = productRepository;
+        this.subCategoryRepository = subCategoryRepository;
     }
 
-    public ProductEntity createProduct(ProductEntity product){
+    public ProductEntity createProduct(Long subCategoryId, ProductEntity product){
+
+        SubCategoryEntity subCategory = subCategoryRepository.findById(subCategoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Can not find Category with Id: " + subCategoryId));
+        product.setSubCategory(subCategory);
         return productRepository.save(product);
     }
 

@@ -1,5 +1,7 @@
 package com.example.Product.Master.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
@@ -22,17 +24,18 @@ public class CategoryEntity {
 
     private boolean isActive;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "category" ,cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SubCategoryEntity> subCategoryList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductEntity> productList = new ArrayList<>();
 
-    public long getCategoryId() {
+
+    public Long getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(long categoryId) {
+    public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
     }
 
@@ -58,5 +61,13 @@ public class CategoryEntity {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public List<SubCategoryEntity> getSubCategoryList() {
+        return subCategoryList;
+    }
+
+    public void setSubCategoryList(List<SubCategoryEntity> subCategoryList) {
+        this.subCategoryList = subCategoryList;
     }
 }

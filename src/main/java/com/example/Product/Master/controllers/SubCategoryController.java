@@ -20,9 +20,9 @@ public class SubCategoryController {
         this.subCategoryService = subCategoryService;
     }
 
-    @PostMapping
-    public ResponseEntity<SubCategoryEntity> createCategory(@Valid @RequestBody SubCategoryEntity subCategory){
-        return ResponseEntity.status(201).body(subCategoryService.createSubCategory(subCategory));
+    @PostMapping("/category/{categoryId}")
+    public ResponseEntity<SubCategoryEntity> createSubCategory(@PathVariable Long categoryId ,@Valid @RequestBody SubCategoryEntity subCategory){
+        return ResponseEntity.status(201).body(subCategoryService.createSubCategory(categoryId, subCategory));
     }
 
     @GetMapping
