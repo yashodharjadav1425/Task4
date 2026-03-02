@@ -1,6 +1,8 @@
 package com.example.Product.Master.controllers;
 
 
+import com.example.Product.Master.dto.ProductRequestDTO;
+import com.example.Product.Master.dto.ProductResponseDTO;
 import com.example.Product.Master.entity.ProductEntity;
 import com.example.Product.Master.services.ProductService;
 import jakarta.validation.Valid;
@@ -20,24 +22,26 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @PostMapping("/subcategory/{subcategoryId}")
-    public ResponseEntity<ProductEntity> createProduct(@RequestParam Long subcategoryId, @Valid @RequestBody ProductEntity product){
-        return ResponseEntity.status(201).body(productService.createProduct(subcategoryId, product));
+    @PostMapping
+    public ResponseEntity<Void> createProduct(@Valid @RequestBody ProductRequestDTO product){
+        productService.createAndUpdateProduct(product);
+        return ResponseEntity.status(201).build();
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductEntity>> getAllProducts(){
+    public ResponseEntity<List<ProductResponseDTO>> getAllProducts(){
         return ResponseEntity.ok(productService.getAllProducts());
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductEntity> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductEntity updatedProduct){
-        return ResponseEntity.ok(productService.updateProduct(id, updatedProduct));
+    @PutMapping
+    public ResponseEntity<Void> updateProduct(@Valid @RequestBody ProductRequestDTO updatedProduct){
+        productService.createAndUpdateProduct(updatedProduct);
+        return ResponseEntity.status(204).build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id){
-        productService.deleteProduct(id);
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long productId){
+        productService.deleteProduct(productId);
         return ResponseEntity.noContent().build();
     }
 }

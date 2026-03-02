@@ -4,10 +4,14 @@ import com.example.Product.Master.services.CategoryService;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "products")
 public class ProductEntity {
@@ -15,17 +19,25 @@ public class ProductEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
 
+    @Setter
+    @Getter
     @NotBlank(message = "Product name should not be blank")
     private String productName;
 
+    @Setter
+    @Getter
     @NotBlank(message = "Product description should not be blank")
     private String description;
 
+    @Setter
+    @Getter
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.01", inclusive = true, message = "Price must be greater than 0")
     @Digits(integer = 10, fraction = 2, message = "Price format is invalid")
     private BigDecimal price;
 
+    @Setter
+    @Getter
     @NotNull(message = "Manufacture date is required")
     @Past(message = "Manufacture date must be in the past")
     private LocalDate manufactureDate;
@@ -57,135 +69,10 @@ public class ProductEntity {
 
     private boolean isActive;
 
-    @JsonBackReference
-    @ManyToOne
-    @JoinColumn(name = "categoryId")
-    private CategoryEntity category;
+    @NotNull(message = "Category is not null")
+    private Long category;
 
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subcategory_id", nullable = false)
-    private SubCategoryEntity subCategory;
+    @NotNull(message = "Subcategory is not null")
+    private Long subCategory;
 
-
-
-    public long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(long productId) {
-        this.productId = productId;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public LocalDate getManufactureDate() {
-        return manufactureDate;
-    }
-
-    public void setManufactureDate(LocalDate manufactureDate) {
-        this.manufactureDate = manufactureDate;
-    }
-
-    public long getProductSerialNumber() {
-        return productSerialNumber;
-    }
-
-    public void setProductSerialNumber(long productSerialNumber) {
-        this.productSerialNumber = productSerialNumber;
-    }
-
-    public String getWarrantyAndSupport() {
-        return warrantyAndSupport;
-    }
-
-    public void setWarrantyAndSupport(String warrantyAndSupport) {
-        this.warrantyAndSupport = warrantyAndSupport;
-    }
-
-    public String getProductCondition() {
-        return productCondition;
-    }
-
-    public void setProductCondition(String productCondition) {
-        this.productCondition = productCondition;
-    }
-
-    public String getProductColor() {
-        return productColor;
-    }
-
-    public void setProductColor(String productColor) {
-        this.productColor = productColor;
-    }
-
-    public double getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(double discount) {
-        this.discount = discount;
-    }
-
-    public LocalDate getFromDate() {
-        return fromDate;
-    }
-
-    public void setFromDate(LocalDate fromDate) {
-        this.fromDate = fromDate;
-    }
-
-    public LocalDate getToDate() {
-        return toDate;
-    }
-
-    public void setToDate(LocalDate toDate) {
-        this.toDate = toDate;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
-    public CategoryEntity getCategory() {
-        return category;
-    }
-
-    public void setCategory(CategoryEntity category) {
-        this.category = category;
-    }
-
-    public SubCategoryEntity getSubCategory() {
-        return subCategory;
-    }
-
-    public void setSubCategory(SubCategoryEntity subCategory) {
-        this.subCategory = subCategory;
-    }
 }

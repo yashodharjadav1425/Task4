@@ -1,5 +1,7 @@
 package com.example.Product.Master.controllers;
 
+import com.example.Product.Master.dto.SubCategoryRequestDTO;
+import com.example.Product.Master.dto.SubCategoryResponseDTO;
 import com.example.Product.Master.entity.CategoryEntity;
 import com.example.Product.Master.entity.SubCategoryEntity;
 import com.example.Product.Master.services.CategoryService;
@@ -20,19 +22,26 @@ public class SubCategoryController {
         this.subCategoryService = subCategoryService;
     }
 
-    @PostMapping("/category/{categoryId}")
-    public ResponseEntity<SubCategoryEntity> createSubCategory(@PathVariable Long categoryId ,@Valid @RequestBody SubCategoryEntity subCategory){
-        return ResponseEntity.status(201).body(subCategoryService.createSubCategory(categoryId, subCategory));
+    @PostMapping
+    public ResponseEntity<Void> createSubCategory(@Valid @RequestBody SubCategoryRequestDTO subCategory){
+        subCategoryService.createAndUpdateSubCategory(subCategory);
+        return ResponseEntity.status(201).build();
     }
 
     @GetMapping
-    public ResponseEntity<List<SubCategoryEntity>> getAllSubCategories(){
+    public ResponseEntity<List<SubCategoryResponseDTO>> getAllSubCategories(){
         return ResponseEntity.ok(subCategoryService.getAllSubCategories());
     }
 
-    @PutMapping("/{subCategoryId}")
-    public ResponseEntity<SubCategoryEntity> updateSubCategory(@PathVariable Long subCategoryId, @Valid @RequestBody SubCategoryEntity updatedSubCategory){
-        return ResponseEntity.ok(subCategoryService.updateSubCategory(subCategoryId, updatedSubCategory));
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<List<SubCategoryResponseDTO>> getSubCategoriesByCategoryId(@PathVariable Long categoryId){
+        return ResponseEntity.ok(subCategoryService.getSubCategoriesByCategoryId(categoryId));
+    }
+
+    @PutMapping
+    public ResponseEntity<Void> updateSubCategory(@Valid @RequestBody SubCategoryRequestDTO updatedSubCategory){
+        subCategoryService.createAndUpdateSubCategory(updatedSubCategory);
+        return ResponseEntity.status(204).build();
     }
 
     @DeleteMapping("/{subCategoryId}")
