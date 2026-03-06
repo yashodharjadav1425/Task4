@@ -19,7 +19,7 @@ public class UserEntity {
     private Long registerId;
 
     @NotBlank(message = "Username is required")
-    @Size(min = 4, max = 15, message = "Username must be between 4 and 15 characters")
+    @Size(min = 4, max = 30, message = "Username must be between 4 and 30 characters")
     @Pattern(regexp = "^[a-zA-Z0-9_]*$", message = "Username can only contain letters, numbers, and underscores")
     private String username;
 
@@ -32,6 +32,5 @@ public class UserEntity {
     @Size(min = 6, max = 120, message = "Password must be between 6 and 30 characters")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).+$", message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character")
     private String password;
-
 
 }

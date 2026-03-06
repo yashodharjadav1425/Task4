@@ -13,9 +13,25 @@ public class ProductResponseDTO {
 
     private Long category;
 
+    private Long subCategory;
+
+    private LocalDate manufactureDate;
+
+    private Long productSerialNumber;
+
+    private String warrantyAndSupport;
+
+    private String productCondition;
+
+    private String productColor;
+
     private BigDecimal price;
 
     private double discount;
+
+    private LocalDate fromDate;
+
+    private LocalDate toDate;
 
     private boolean isActive;
 
@@ -51,6 +67,54 @@ public class ProductResponseDTO {
         this.category = category;
     }
 
+    public Long getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(Long subCategory) {
+        this.subCategory = subCategory;
+    }
+
+    public LocalDate getManufactureDate() {
+        return manufactureDate;
+    }
+
+    public void setManufactureDate(LocalDate manufactureDate) {
+        this.manufactureDate = manufactureDate;
+    }
+
+    public Long getProductSerialNumber() {
+        return productSerialNumber;
+    }
+
+    public void setProductSerialNumber(Long productSerialNumber) {
+        this.productSerialNumber = productSerialNumber;
+    }
+
+    public String getWarrantyAndSupport() {
+        return warrantyAndSupport;
+    }
+
+    public void setWarrantyAndSupport(String warrantyAndSupport) {
+        this.warrantyAndSupport = warrantyAndSupport;
+    }
+
+    public String getProductCondition() {
+        return productCondition;
+    }
+
+    public void setProductCondition(String productCondition) {
+        this.productCondition = productCondition;
+    }
+
+    public String getProductColor() {
+        return productColor;
+    }
+
+    public void setProductColor(String productColor) {
+        this.productColor = productColor;
+    }
+
     public BigDecimal getPrice() {
         return price;
     }
@@ -65,6 +129,22 @@ public class ProductResponseDTO {
 
     public void setDiscount(double discount) {
         this.discount = discount;
+    }
+
+    public LocalDate getFromDate() {
+        return fromDate;
+    }
+
+    public void setFromDate(LocalDate fromDate) {
+        this.fromDate = fromDate;
+    }
+
+    public LocalDate getToDate() {
+        return toDate;
+    }
+
+    public void setToDate(LocalDate toDate) {
+        this.toDate = toDate;
     }
 
     public boolean isActive() {

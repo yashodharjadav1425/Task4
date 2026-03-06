@@ -9,6 +9,7 @@ import com.example.Product.Master.entity.ProductEntity;
 import com.example.Product.Master.entity.SubCategoryEntity;
 import com.example.Product.Master.exception.ResourceNotFoundException;
 import com.example.Product.Master.repository.CategoryRepository;
+import com.example.Product.Master.repository.ProductRepository;
 import com.example.Product.Master.repository.SubCategoryRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,15 +20,23 @@ import java.util.List;
 public class SubCategoryService {
     private final SubCategoryRepository subCategoryRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
 
-    public SubCategoryService(SubCategoryRepository subCategoryRepository, CategoryRepository categoryRepository) {
+    public SubCategoryService(SubCategoryRepository subCategoryRepository, CategoryRepository categoryRepository, ProductRepository productRepository) {
         this.subCategoryRepository = subCategoryRepository;
         this.categoryRepository = categoryRepository;
+        this.productRepository = productRepository;
     }
 
     public void createAndUpdateSubCategory(SubCategoryRequestDTO subCategoryRequestDTO){
 
+        String subCategoryName = subCategoryRequestDTO.getSubCategoryName().trim();
+
         if(subCategoryRequestDTO.getSubCategoryId() == null){
+
+            if (subCategoryRepository.existsBySubCategoryNameIgnoreCase(subCategoryName)){
+                throw new RuntimeException("Subcategory already present");
+            }
 
             SubCategoryEntity subCategoryEntity = new SubCategoryEntity();
 
@@ -35,6 +44,7 @@ public class SubCategoryService {
             subCategoryEntity.setSubCategoryName(subCategoryRequestDTO.getSubCategoryName());
             subCategoryEntity.setDescription(subCategoryRequestDTO.getDescription());
             subCategoryEntity.setActive(true);
+            subCategoryEntity.setIsDeleted(1);
 
 
             subCategoryRepository.save(subCategoryEntity);
@@ -42,10 +52,16 @@ public class SubCategoryService {
             SubCategoryEntity existSubCategory = subCategoryRepository.findById(subCategoryRequestDTO.getSubCategoryId())
                     .orElseThrow(() -> new ResourceNotFoundException("Subcategory not found with id: " + subCategoryRequestDTO.getSubCategoryId()));
 
+            if(subCategoryRepository.existsBySubCategoryNameIgnoreCase(subCategoryName)
+                    && !existSubCategory.getSubCategoryName().equalsIgnoreCase(subCategoryName)){
+                throw new RuntimeException("Subcategory already present");
+            }
+
             existSubCategory.setCategory(subCategoryRequestDTO.getCategory());
             existSubCategory.setSubCategoryName(subCategoryRequestDTO.getSubCategoryName());
             existSubCategory.setDescription(subCategoryRequestDTO.getDescription());
             existSubCategory.setActive(subCategoryRequestDTO.isActive());
+            existSubCategory.setIsDeleted(1);
 
             subCategoryRepository.save(existSubCategory);
         }
@@ -57,19 +73,21 @@ public class SubCategoryService {
 
         for (SubCategoryEntity subCategory : subCategoryRepository.findAll()){
 
-            SubCategoryResponseDTO subCategoryResponse = new SubCategoryResponseDTO();
+            if (subCategory.getIsDeleted() != 9){
+                SubCategoryResponseDTO subCategoryResponse = new SubCategoryResponseDTO();
 
-            subCategoryResponse.setActive(subCategory.isActive());
-            subCategoryResponse.setSubCategoryId(subCategory.getSubCategoryId());
+                subCategoryResponse.setActive(subCategory.isActive());
+                subCategoryResponse.setSubCategoryId(subCategory.getSubCategoryId());
 
-            CategoryEntity category = categoryRepository.findById(subCategory.getCategory())
-                    .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+                CategoryEntity category = categoryRepository.findById(subCategory.getCategory())
+                        .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+                subCategoryResponse.setCategoryId(subCategory.getCategory());
+                subCategoryResponse.setCategoryName(category.getCategoryName());
+                subCategoryResponse.setSubCategoryName(subCategory.getSubCategoryName());
+                subCategoryResponse.setDescription(subCategory.getDescription());
 
-            subCategoryResponse.setCategoryName(category.getCategoryName());
-            subCategoryResponse.setSubCategoryName(subCategory.getSubCategoryName());
-            subCategoryResponse.setDescription(subCategory.getDescription());
-
-            subCategoryResponseDTO.add(subCategoryResponse);
+                subCategoryResponseDTO.add(subCategoryResponse);
+            }
         }
 
         return subCategoryResponseDTO;
@@ -84,13 +102,16 @@ public class SubCategoryService {
 
         List<SubCategoryResponseDTO> subCategoryResponseDTOList = new ArrayList<>();
         for (SubCategoryEntity sub : subCategories) {
-            SubCategoryResponseDTO subCategoryResponseDTO = new SubCategoryResponseDTO();
-            subCategoryResponseDTO.setSubCategoryId(sub.getSubCategoryId());
-            subCategoryResponseDTO.setSubCategoryName(sub.getSubCategoryName());
-            subCategoryResponseDTO.setDescription(sub.getDescription());
-            subCategoryResponseDTO.setActive(sub.isActive());
-            subCategoryResponseDTO.setCategoryName(category.getCategoryName());
-            subCategoryResponseDTOList.add(subCategoryResponseDTO);
+            if(sub.getIsDeleted() != 9){
+                SubCategoryResponseDTO subCategoryResponseDTO = new SubCategoryResponseDTO();
+                subCategoryResponseDTO.setSubCategoryId(sub.getSubCategoryId());
+                subCategoryResponseDTO.setSubCategoryName(sub.getSubCategoryName());
+                subCategoryResponseDTO.setDescription(sub.getDescription());
+                subCategoryResponseDTO.setActive(sub.isActive());
+                subCategoryResponseDTO.setCategoryId(category.getCategoryId());
+                subCategoryResponseDTO.setCategoryName(category.getCategoryName());
+                subCategoryResponseDTOList.add(subCategoryResponseDTO);
+            }
         }
 
         return subCategoryResponseDTOList;
@@ -100,6 +121,14 @@ public class SubCategoryService {
 
         SubCategoryEntity existingSubCategory = subCategoryRepository.findById(subCategoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Subcategory not found with ID: " + subCategoryId));
-        subCategoryRepository.delete(existingSubCategory);
+
+        boolean subCategoryExists = productRepository.existsBySubCategory(subCategoryId);
+
+        if(subCategoryExists){
+            throw new RuntimeException("Subcategory cannot be deleted because it contains products");
+        }
+
+        existingSubCategory.setIsDeleted(9);
+        subCategoryRepository.save(existingSubCategory);
     }
 }

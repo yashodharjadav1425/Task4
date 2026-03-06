@@ -3,9 +3,11 @@ package com.example.Product.Master.controllers;
 
 import com.example.Product.Master.dto.AuthResponseDTO;
 import com.example.Product.Master.dto.LoginRequestDTO;
+import com.example.Product.Master.dto.LoginResponseDTO;
 import com.example.Product.Master.dto.RegisterRequestDTO;
 import com.example.Product.Master.services.AuthService;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,7 @@ public class AuthController {
 
     private final AuthService authService;
 
+
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request){
 
@@ -27,6 +30,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO request){
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<LoginResponseDTO> getUser(){
+        return ResponseEntity.ok(authService.getLoggedInUser());
     }
 
 }

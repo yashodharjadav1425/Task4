@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface SubCategoryRepository extends JpaRepository<SubCategoryEntity, Long> {
     List<SubCategoryEntity> findByCategory(Long categoryId);
+    boolean existsBySubCategoryNameIgnoreCase(String subCategoryName);
+    boolean existsByCategory(Long categoryId);
 }

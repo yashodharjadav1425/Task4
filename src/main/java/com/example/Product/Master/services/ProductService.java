@@ -49,6 +49,7 @@ public class ProductService {
             productEntity.setSubCategory(productRequestDTO.getSubCategory());
 
             productEntity.setActive(true);
+            productEntity.setIsDeleted(1);
 
 
             productRepository.save(productEntity);
@@ -70,7 +71,7 @@ public class ProductService {
             existProduct.setCategory(productRequestDTO.getCategory());
             existProduct.setSubCategory(productRequestDTO.getSubCategory());
             existProduct.setActive(productRequestDTO.isActive());
-
+            existProduct.setIsDeleted(1);
 
             productRepository.save(existProduct);
         }
@@ -82,17 +83,27 @@ public class ProductService {
 
         for (ProductEntity product : productRepository.findAll()){
 
-            ProductResponseDTO productResponse = new ProductResponseDTO();
+            if(product.getIsDeleted() != 9){
+                ProductResponseDTO productResponse = new ProductResponseDTO();
 
-            productResponse.setActive(product.isActive());
-            productResponse.setProductId(product.getProductId());
-            productResponse.setProductName(product.getProductName());
-            productResponse.setDescription(product.getDescription());
-            productResponse.setCategory(product.getCategory());
-            productResponse.setPrice(product.getPrice());
-            productResponse.setDiscount(product.getDiscount());
+                productResponse.setActive(product.isActive());
+                productResponse.setProductId(product.getProductId());
+                productResponse.setProductName(product.getProductName());
+                productResponse.setDescription(product.getDescription());
+                productResponse.setCategory(product.getCategory());
+                productResponse.setSubCategory(product.getSubCategory());
+                productResponse.setPrice(product.getPrice());
+                productResponse.setManufactureDate(product.getManufactureDate());
+                productResponse.setProductSerialNumber(product.getProductSerialNumber());
+                productResponse.setWarrantyAndSupport(product.getWarrantyAndSupport());
+                productResponse.setProductCondition(product.getProductCondition());
+                productResponse.setProductColor(product.getProductColor());
+                productResponse.setDiscount(product.getDiscount());
+                productResponse.setFromDate(product.getFromDate());
+                productResponse.setToDate(product.getToDate());
 
-            productResponseDTO.add(productResponse);
+                productResponseDTO.add(productResponse);
+            }
         }
 
         return productResponseDTO;
@@ -103,6 +114,8 @@ public class ProductService {
 
         ProductEntity existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + id));
-        productRepository.delete(existingProduct);
+
+        existingProduct.setIsDeleted(9);
+        productRepository.save(existingProduct);
     }
 }

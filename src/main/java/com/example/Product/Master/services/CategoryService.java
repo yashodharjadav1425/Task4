@@ -8,6 +8,7 @@ import com.example.Product.Master.entity.SubCategoryEntity;
 import com.example.Product.Master.exception.ResourceNotFoundException;
 import com.example.Product.Master.repository.CategoryRepository;
 import com.example.Product.Master.repository.ProductRepository;
+import com.example.Product.Master.repository.SubCategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,19 +18,30 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final SubCategoryRepository subCategoryRepository;
+    private final ProductRepository productRepository;
 
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, SubCategoryRepository subCategoryRepository, ProductRepository productRepository) {
         this.categoryRepository = categoryRepository;
+        this.subCategoryRepository = subCategoryRepository;
+        this.productRepository = productRepository;
     }
 
     public void createAndUpdateCategory(CategoryRequestDTO categoryRequestDTO){
 
+        String categoryName = categoryRequestDTO.getCategoryName().trim();
+
         if(categoryRequestDTO.getCategoryId() == null){
+
+            if (categoryRepository.existsByCategoryNameIgnoreCase(categoryName)){
+                throw new RuntimeException("Category already present");
+            }
 
             CategoryEntity categoryEntity = new CategoryEntity();
 
             categoryEntity.setCategoryName(categoryRequestDTO.getCategoryName());
             categoryEntity.setDescription(categoryRequestDTO.getDescription());
+            categoryEntity.setIsDeleted(1);
             categoryEntity.setActive(true);
 
             categoryRepository.save(categoryEntity);
@@ -37,9 +49,15 @@ public class CategoryService {
             CategoryEntity existCategory = categoryRepository.findById(categoryRequestDTO.getCategoryId())
                     .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + categoryRequestDTO.getCategoryId()));
 
+            if(categoryRepository.existsByCategoryNameIgnoreCase(categoryName)
+                    && !existCategory.getCategoryName().equalsIgnoreCase(categoryName)){
+                throw new RuntimeException("Category already present");
+            }
+
             existCategory.setCategoryName(categoryRequestDTO.getCategoryName());
             existCategory.setDescription(categoryRequestDTO.getDescription());
             existCategory.setActive(categoryRequestDTO.getIsActive());
+            existCategory.setIsDeleted(1);
 
             categoryRepository.save(existCategory);
         }
@@ -51,29 +69,20 @@ public class CategoryService {
 
         for (CategoryEntity category : categoryRepository.findAll()){
 
-            CategoryResponseDTO categoryResponse = new CategoryResponseDTO();
+            if(category.getIsDeleted() != 9){
+                CategoryResponseDTO categoryResponse = new CategoryResponseDTO();
 
-            categoryResponse.setCategoryId(category.getCategoryId());
-            categoryResponse.setCategoryName(category.getCategoryName());
-            categoryResponse.setDescription(category.getDescription());
-            categoryResponse.setIsActive(category.isActive());
+                categoryResponse.setCategoryId(category.getCategoryId());
+                categoryResponse.setCategoryName(category.getCategoryName());
+                categoryResponse.setDescription(category.getDescription());
+                categoryResponse.setIsActive(category.isActive());
 
-            categoryResponseDTO.add(categoryResponse);
+                categoryResponseDTO.add(categoryResponse);
+            }
         }
 
         return categoryResponseDTO;
     }
-
-//    public CategoryEntity updateCategory(Long categoryId, CategoryEntity updatedCategory){
-//        CategoryEntity existingCategory = categoryRepository.findById(categoryId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + categoryId));
-//
-//        existingCategory.setCategoryName(updatedCategory.getCategoryName());
-//        existingCategory.setDescription(updatedCategory.getDescription());
-//        existingCategory.setActive(updatedCategory.isActive());
-//
-//        return categoryRepository.save(existingCategory);
-//    }
 
 
     public void deleteCategory(Long categoryId){
@@ -81,7 +90,16 @@ public class CategoryService {
         CategoryEntity existingCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + categoryId));
 
-        categoryRepository.delete(existingCategory);
+        boolean subCategoryExists = subCategoryRepository.existsByCategory(categoryId);
+        boolean productExists = productRepository.existsByCategory(categoryId);
+
+        if (subCategoryExists || productExists) {
+            throw new RuntimeException("Category cannot be deleted because it contains subcategories or products");
+        }
+
+        existingCategory.setIsDeleted(9);
+
+        categoryRepository.save(existingCategory);
     }
 
 }

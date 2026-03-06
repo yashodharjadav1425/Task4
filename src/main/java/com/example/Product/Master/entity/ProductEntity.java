@@ -19,25 +19,22 @@ public class ProductEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
 
-    @Setter
-    @Getter
+
     @NotBlank(message = "Product name should not be blank")
+    @Size(max = 30, message = "Product name size must be less than 30 characters.")
     private String productName;
 
-    @Setter
-    @Getter
+
     @NotBlank(message = "Product description should not be blank")
+    @Size(max = 255, message = "Description size must be less than 255 characters.")
     private String description;
 
-    @Setter
-    @Getter
+
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.01", inclusive = true, message = "Price must be greater than 0")
     @Digits(integer = 10, fraction = 2, message = "Price format is invalid")
     private BigDecimal price;
 
-    @Setter
-    @Getter
     @NotNull(message = "Manufacture date is required")
     @Past(message = "Manufacture date must be in the past")
     private LocalDate manufactureDate;
@@ -74,5 +71,7 @@ public class ProductEntity {
 
     @NotNull(message = "Subcategory is not null")
     private Long subCategory;
+
+    private Integer isDeleted;
 
 }
